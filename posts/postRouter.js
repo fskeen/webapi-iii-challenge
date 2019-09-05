@@ -25,12 +25,42 @@ router.get('/:id', validatePostId, (req, res) => { // get a specific post?
     })
 });
 
-router.delete('/:id', (req, res) => { // delete a specific post?
-
+router.delete('/:id', validatePostId, (req, res) => { // delete a specific post?
+    const id = req.params.id;
+    postdb.remove(id)
+    .then((numDeleted) => {
+        if (numDeleted > 0) {
+            res.status(200).json({
+                message: "Deleted post."
+            })
+        } else {
+            res.status(500).json({
+                error: "Unable to delete that post. It is too good."
+            })
+        }
+    })
 });
 
-router.put('/:id', (req, res) => { // edit a specific post?
-
+router.put('/:id', validatePostId, (req, res) => { // edit a specific post?
+    const id = req.params.id;
+    const changes = req.body;
+    postdb.update(id, changes)
+    .then(editSuccess => {
+        if (editSuccess) {
+            res.status(200).json({
+                message: "Successfully edited requested resource."
+            })
+        } else {
+            res.status(500).json({
+                error: "Unable to edit the requested resource."
+            })
+        }
+    })
+    .catch(() => {
+        res.status(500).json({
+            error: "Unable to edit the requested resource."
+        })
+    })
 });
 
 // custom middleware
